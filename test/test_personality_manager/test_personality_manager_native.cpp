@@ -1,5 +1,6 @@
 #include <unity.h>
 #include <cstring>
+#include "../../lib/Platform/src/Platform.h"
 #include "../../lib/Personality/src/Personality.h"
 #include "../../lib/Personality/src/PersonalityImpl.h"
 #include "../../lib/PersonalityManager/src/PersonalityManager.h"

@@ -4,13 +4,13 @@
 static void moveServoToAngle(uint8_t pin, uint8_t angle, unsigned long duration) {
     // Map angle (0-180) to PWM value (1000-2000 microseconds for SG90)
     unsigned long pulseWidth = 1000 + (angle * 1000 / 180);
-    unsigned long startTime = millis();
+    unsigned long startTime = Platform::millis();
 
-    while (millis() - startTime < duration) {
-        digitalWrite(pin, HIGH);
-        delayMicroseconds(pulseWidth);
-        digitalWrite(pin, LOW);
-        delayMicroseconds(20000 - pulseWidth);
+    while (Platform::millis() - startTime < duration) {
+        Platform::digitalWrite(pin, 1); // HIGH
+        Platform::delayMicroseconds(pulseWidth);
+        Platform::digitalWrite(pin, 0); // LOW
+        Platform::delayMicroseconds(20000 - pulseWidth);
     }
 }
 
@@ -34,13 +34,13 @@ void SlowPersonality::execute(uint8_t servoPin) {
 void JitteryPersonality::execute(uint8_t servoPin) {
     // Quick twitch up
     moveServoToAngle(servoPin, 45, 100);
-    delay(100);
+    Platform::delay(100);
     // Twitch back
     moveServoToAngle(servoPin, 0, 100);
-    delay(100);
+    Platform::delay(100);
     // Another twitch
     moveServoToAngle(servoPin, 60, 150);
-    delay(100);
+    Platform::delay(100);
     // Final movement to off position
     moveServoToAngle(servoPin, 90, 300);
     // Return
@@ -51,7 +51,7 @@ void JitteryPersonality::execute(uint8_t servoPin) {
 void LazyPersonality::execute(uint8_t servoPin) {
     // Slow, lazy movement to off position
     moveServoToAngle(servoPin, 90, 2000);
-    delay(500);
+    Platform::delay(500);
     // Slow return
     moveServoToAngle(servoPin, 0, 500);
 }

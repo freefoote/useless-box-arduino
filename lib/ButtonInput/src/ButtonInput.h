@@ -1,7 +1,12 @@
 #ifndef BUTTON_INPUT_H
 #define BUTTON_INPUT_H
 
-#include <Arduino.h>
+#ifdef ARDUINO
+    #include <Arduino.h>
+#else
+    #include <cstdint>
+#endif
+#include "../../../lib/Platform/src/Platform.h"
 
 /**
  * Handles button input with debouncing
@@ -12,6 +17,7 @@ private:
     uint8_t debounceDelay;
     uint8_t lastState;
     unsigned long lastDebounceTime;
+    uint8_t lastReportedPin;
 
 public:
     /**

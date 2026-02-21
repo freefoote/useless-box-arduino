@@ -1,7 +1,11 @@
 #ifndef PERSONALITY_H
 #define PERSONALITY_H
 
-#include <Arduino.h>
+#ifdef ARDUINO
+    #include <Arduino.h>
+#else
+    #include <cstdint>
+#endif
 
 /**
  * Base class for useless box personalities.

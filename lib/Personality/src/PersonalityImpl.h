@@ -2,6 +2,7 @@
 #define PERSONALITY_IMPL_H
 
 #include "Personality.h"
+#include "../../../lib/Platform/src/Platform.h"
 
 /**
  * Fast personality - quickly flicks the switch off and returns

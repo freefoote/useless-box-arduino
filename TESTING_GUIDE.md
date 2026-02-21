@@ -4,9 +4,32 @@
 
 This project implements a "useless box" with multiple personalities that cycle through different behaviors when the button is activated. The system is designed with testability in mind, allowing unit tests to run locally before deployment to the Arduino UNO.
 
+## Key Architecture: Platform Abstraction Layer
+
+The core innovation is the **Platform Abstraction Layer** ([`lib/Platform/`](lib/Platform/)) that separates hardware-specific code from business logic:
+
+- **For Arduino**: Uses real Arduino functions (`digitalWrite`, `digitalRead`, `millis`, etc.)
+- **For Testing**: Uses mock implementations that can be controlled in tests
+
+This allows the personality system and button input to be tested without any Arduino hardware or dependencies.
+
 ## Project Structure
 
 ### Libraries
+
+#### [`lib/Platform/`](lib/Platform/) - **Platform Abstraction Layer**
+
+Provides hardware abstraction for testability:
+
+- [`Platform.h`](lib/Platform/src/Platform.h) - Platform interface
+- [`Platform.cpp`](lib/Platform/src/Platform.cpp) - Arduino implementation + mock implementations
+
+**Key Feature**: Uses `#ifdef ARDUINO` to switch between:
+
+- Real Arduino functions when compiling for Arduino UNO
+- Mock implementations when compiling for native testing
+
+This is the secret sauce that makes everything testable without Arduino hardware!
 
 #### [`lib/Personality/`](lib/Personality/)
 
@@ -110,13 +133,29 @@ pio test -e native -vvv
 When tests pass, you should see:
 
 ```
-=============================================================== SUMMARY ===============================================================
+========================================================== SUMMARY ==========================================================
 Environment    Test                      Status    Duration
 -------------  ------------------------  --------  ------------
-native         test_button_input         PASSED    00:00:XX.XXX
-native         test_personality_manager  PASSED    00:00:XX.XXX
-================== 2 test cases: 2 succeeded in 00:00:XX.XXX ==================
+native         test_button_input         PASSED    00:00:01.841
+native         test_personality_manager  PASSED    00:00:02.053
+======================================== 10 test cases: 10 succeeded in 00:00:03.894 ========================================
 ```
+
+### Test Coverage
+
+**test_button_input** (4 tests):
+
+- Button initialization with INPUT_PULLUP mode
+- Press detection with debouncing
+- Debounce filtering of noise
+- State reading (pressed/released)
+
+**test_personality_manager** (6 tests):
+
+- Manager initialization
+- Current personality execution
+- Personality cycling through all types
+- Personality metadata (names and durations)
 
 ## Building for Arduino UNO
 

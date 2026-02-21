@@ -1,7 +1,11 @@
 #ifndef PERSONALITY_MANAGER_H
 #define PERSONALITY_MANAGER_H
 
-#include <Arduino.h>
+#ifdef ARDUINO
+    #include <Arduino.h>
+#else
+    #include <cstdint>
+#endif
 #include "../../../lib/Personality/src/Personality.h"
 
 /**
