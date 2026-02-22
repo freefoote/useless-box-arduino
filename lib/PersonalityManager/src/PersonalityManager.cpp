@@ -4,9 +4,9 @@ PersonalityManager::PersonalityManager(Personality** personalityArray, uint8_t c
     : personalities(personalityArray), personalityCount(count), currentIndex(0) {
 }
 
-void PersonalityManager::executeCurrent(uint8_t servoPin) {
+void PersonalityManager::executeCurrent(uint8_t servoPin, CancellationCheckFn cancellationCheck) {
     if (personalityCount > 0 && personalities[currentIndex] != nullptr) {
-        personalities[currentIndex]->execute(servoPin);
+        personalities[currentIndex]->execute(servoPin, cancellationCheck);
     }
 }
 

@@ -32,8 +32,9 @@ public:
      * Execute the current personality
      *
      * @param servoPin The PWM pin connected to the servo
+     * @param cancellationCheck Optional callback to check if execution should be cancelled
      */
-    void executeCurrent(uint8_t servoPin);
+    void executeCurrent(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr);
 
     /**
      * Advance to the next personality in the cycle

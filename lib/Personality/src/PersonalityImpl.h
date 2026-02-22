@@ -9,7 +9,7 @@
  */
 class FastPersonality : public Personality {
 public:
-    void execute(uint8_t servoPin) override;
+    void execute(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr) override;
     const char* getName() const override { return "Fast"; }
     unsigned long getDuration() const override { return 500; }
 };
@@ -19,7 +19,7 @@ public:
  */
 class SlowPersonality : public Personality {
 public:
-    void execute(uint8_t servoPin) override;
+    void execute(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr) override;
     const char* getName() const override { return "Slow"; }
     unsigned long getDuration() const override { return 2000; }
 };
@@ -29,7 +29,7 @@ public:
  */
 class JitteryPersonality : public Personality {
 public:
-    void execute(uint8_t servoPin) override;
+    void execute(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr) override;
     const char* getName() const override { return "Jittery"; }
     unsigned long getDuration() const override { return 1500; }
 };
@@ -39,7 +39,7 @@ public:
  */
 class LazyPersonality : public Personality {
 public:
-    void execute(uint8_t servoPin) override;
+    void execute(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr) override;
     const char* getName() const override { return "Lazy"; }
     unsigned long getDuration() const override { return 3000; }
 };

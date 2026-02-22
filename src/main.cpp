@@ -29,6 +29,11 @@ PersonalityManager personalityManager(personalities, 4);
 // Create button input
 ButtonInput button(BUTTON_PIN);
 
+// Cancellation check callback - returns true if button is still pressed
+bool checkButtonStillPressed() {
+    return button.getState();
+}
+
 void setup() {
     Serial.begin(9600);
     button.begin();
@@ -45,8 +50,9 @@ void loop() {
         Serial.print("Button pressed! Executing personality: ");
         Serial.println(personalityManager.getCurrent()->getName());
 
-        // Execute current personality
-        personalityManager.executeCurrent(SERVO_PIN);
+        // Execute current personality with cancellation check
+        // If button is released during execution, the personality will reverse
+        personalityManager.executeCurrent(SERVO_PIN, checkButtonStillPressed);
 
         // Move to next personality for next activation
         personalityManager.nextPersonality();

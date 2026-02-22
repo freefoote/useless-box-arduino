@@ -10,10 +10,19 @@ class MockPersonality : public Personality {
 public:
     int executeCount = 0;
     uint8_t lastServoPin = 0;
+    CancellationCheckFn lastCancellationCheck = nullptr;
+    bool cancellationCheckCalled = false;
 
-    void execute(uint8_t servoPin) override {
+    void execute(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr) override {
         executeCount++;
         lastServoPin = servoPin;
+        lastCancellationCheck = cancellationCheck;
+
+        // Simulate calling the cancellation check if provided
+        if (cancellationCheck) {
+            cancellationCheckCalled = true;
+            cancellationCheck();
+        }
     }
 
     const char* getName() const override {
@@ -91,6 +100,42 @@ void test_personality_manager_cycle(void) {
     TEST_ASSERT_EQUAL_INT(2, p1.executeCount);
 }
 
+void test_personality_manager_execute_with_cancellation_check(void) {
+    MockPersonality p1;
+    Personality* personalities[] = {&p1};
+    PersonalityManager manager(personalities, 1);
+
+    // Create a simple cancellation check function
+    bool buttonPressed = true;
+    auto checkButton = [](void) -> bool {
+        return true; // Button still pressed
+    };
+
+    manager.executeCurrent(9, checkButton);
+    TEST_ASSERT_EQUAL_INT(1, p1.executeCount);
+    TEST_ASSERT_EQUAL_UINT8(9, p1.lastServoPin);
+    TEST_ASSERT_TRUE(p1.cancellationCheckCalled);
+    TEST_ASSERT_NOT_NULL(p1.lastCancellationCheck);
+}
+
+// Global flag for testing callback invocation
+static bool g_testCallbackInvoked = false;
+
+static bool testCancellationCallback(void) {
+    g_testCallbackInvoked = true;
+    return true;
+}
+
+void test_personality_execute_with_cancellation_callback(void) {
+    // Test that cancellation callback is properly passed through
+    MockPersonality mock;
+    g_testCallbackInvoked = false;
+
+    mock.execute(5, testCancellationCallback);
+    TEST_ASSERT_EQUAL_INT(1, mock.executeCount);
+    TEST_ASSERT_TRUE(g_testCallbackInvoked);
+}
+
 void test_personality_names(void) {
     FastPersonality fast;
     SlowPersonality slow;
@@ -121,6 +166,8 @@ int main(int argc, char **argv) {
     RUN_TEST(test_personality_manager_execute_current);
     RUN_TEST(test_personality_manager_next_personality);
     RUN_TEST(test_personality_manager_cycle);
+    RUN_TEST(test_personality_manager_execute_with_cancellation_check);
+    RUN_TEST(test_personality_execute_with_cancellation_callback);
     RUN_TEST(test_personality_names);
     RUN_TEST(test_personality_durations);
     return UNITY_END();
