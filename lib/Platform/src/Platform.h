@@ -79,6 +79,15 @@ namespace Platform {
      */
     void servoWrite(uint8_t angle);
 
+    /**
+     * Move servo smoothly to a target angle over a specified duration
+     *
+     * @param targetAngle The target angle (0-180)
+     * @param durationMs The duration in milliseconds to reach the target angle
+     * @param cancellationCheck Optional callback to check for cancellation (returns true if should continue)
+     */
+    void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, bool (*cancellationCheck)() = nullptr);
+
     // Test helper namespace
     namespace Test {
         void setMillis(unsigned long ms);

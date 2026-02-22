@@ -5,6 +5,7 @@
     #include <Servo.h>
 
     static Servo servoInstance;
+    static uint8_t currentServoAngle = 0;
 
     namespace Platform {
         void pwmWrite(uint8_t pin, uint8_t value) {
@@ -37,10 +38,36 @@
 
         void servoInit(uint8_t pin) {
             servoInstance.attach(pin);
+            currentServoAngle = 0;
         }
 
         void servoWrite(uint8_t angle) {
             servoInstance.write(angle);
+            currentServoAngle = angle;
+        }
+
+        void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, bool (*cancellationCheck)()) {
+            unsigned long startTime = ::millis();
+            uint8_t startAngle = currentServoAngle;
+            int angleDifference = (int)targetAngle - (int)startAngle;
+
+            while (::millis() - startTime < durationMs) {
+                // Check for cancellation
+                if (cancellationCheck && !cancellationCheck()) {
+                    return; // Exit early if cancelled
+                }
+
+                unsigned long elapsedTime = ::millis() - startTime;
+                // Linear interpolation: calculate current angle based on elapsed time
+                uint8_t currentAngle = startAngle + (angleDifference * elapsedTime) / durationMs;
+                servoWrite(currentAngle);
+
+                // Small delay to prevent busy-waiting and allow servo to move
+                // ::delay(10);
+            }
+
+            // Ensure we reach the exact target angle
+            servoWrite(targetAngle);
         }
     }
 #else
@@ -94,10 +121,35 @@
             if (pin < 14) {
                 mockPinMode[pin] = 0xFF; // Mark as servo pin
             }
+            mockServoAngle = 0;
         }
 
         void servoWrite(uint8_t angle) {
             mockServoAngle = angle;
+        }
+
+        void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, bool (*cancellationCheck)()) {
+            unsigned long startTime = mockMillisValue;
+            uint8_t startAngle = mockServoAngle;
+            int angleDifference = (int)targetAngle - (int)startAngle;
+
+            while (mockMillisValue - startTime < durationMs) {
+                // Check for cancellation
+                if (cancellationCheck && !cancellationCheck()) {
+                    return; // Exit early if cancelled
+                }
+
+                unsigned long elapsedTime = mockMillisValue - startTime;
+                // Linear interpolation: calculate current angle based on elapsed time
+                uint8_t currentAngle = startAngle + (angleDifference * elapsedTime) / durationMs;
+                servoWrite(currentAngle);
+
+                // Small delay to advance mock time
+                delay(10);
+            }
+
+            // Ensure we reach the exact target angle
+            servoWrite(targetAngle);
         }
     }
 

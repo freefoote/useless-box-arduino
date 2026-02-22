@@ -5,22 +5,8 @@
 
 // Move servo to angle over a specified duration with optional cancellation check
 static void moveServoToAngle(uint8_t pin, uint8_t angle, unsigned long duration, CancellationCheckFn cancellationCheck = nullptr) {
-    unsigned long startTime = Platform::millis();
-
-    // Set the servo to the target angle immediately
-    Platform::servoWrite(angle);
-
-    // Wait for the specified duration while checking for cancellation
-    while (Platform::millis() - startTime < duration) {
-        // Check for cancellation
-        if (cancellationCheck && !cancellationCheck()) {
-            return; // Exit early if button released
-        }
-
-        // Keep servo at target angle during movement
-        Platform::servoWrite(angle);
-        Platform::delay(10); // Small delay to prevent busy-waiting
-    }
+    // Use smooth movement with the specified duration
+    Platform::servoSmoothMove(angle, duration, cancellationCheck);
 }
 
 // Fast personality - quick flick

@@ -47,7 +47,7 @@ namespace JitteryPersonalityConfig {
     const uint8_t TWITCH_2_ANGLE = 60;       // Second twitch angle
     const unsigned long TWITCH_2_DURATION = 150;
     const uint8_t OFF_ANGLE = SWITCH_OFF_ANGLE;            // Final off angle
-    const unsigned long OFF_DURATION = 300;  // Time to move off
+    const unsigned long OFF_DURATION = 500;  // Time to move off
     const unsigned long ON_DURATION = 200;   // Time to return on
 }
 
