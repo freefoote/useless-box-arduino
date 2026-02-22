@@ -28,7 +28,7 @@ namespace ServoConfig {
 // Fast Personality - quick flick
 namespace FastPersonalityConfig {
     const uint8_t OFF_ANGLE = SWITCH_OFF_ANGLE;           // Angle to move to (off position)
-    const unsigned long OFF_DURATION = 300; // Time to move off (ms)
+    const unsigned long OFF_DURATION = 500; // Time to move off (ms)
     const unsigned long ON_DURATION = 200;  // Time to return on (ms)
 }
 

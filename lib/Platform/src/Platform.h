@@ -79,14 +79,15 @@ namespace Platform {
      */
     void servoWrite(uint8_t angle);
 
-    /**
-     * Move servo smoothly to a target angle over a specified duration
-     *
-     * @param targetAngle The target angle (0-180)
-     * @param durationMs The duration in milliseconds to reach the target angle
-     * @param cancellationCheck Optional callback to check for cancellation (returns true if should continue)
-     */
-    void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, bool (*cancellationCheck)() = nullptr);
+     /**
+      * Move servo smoothly to a target angle over a specified duration with easing
+      *
+      * @param targetAngle The target angle (0-180)
+      * @param durationMs The duration in milliseconds to reach the target angle
+      * @param easingType The easing function to use (0=linear, 1=quadratic, 2=cubic, etc.)
+      * @param cancellationCheck Optional callback to check for cancellation (returns true if should continue)
+      */
+     void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, uint8_t easingType = 0, bool (*cancellationCheck)() = nullptr);
 
     // Test helper namespace
     namespace Test {

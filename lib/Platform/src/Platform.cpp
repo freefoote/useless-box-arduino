@@ -3,8 +3,10 @@
 #ifdef ARDUINO
     #include <Arduino.h>
     #include <Servo.h>
+    #define SUPPRESS_HPP_WARNING
+    #include <ServoEasing.hpp>
 
-    static Servo servoInstance;
+    static ServoEasing servoInstance;
     static uint8_t currentServoAngle = 0;
 
     namespace Platform {
@@ -46,31 +48,46 @@
             currentServoAngle = angle;
         }
 
-        void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, bool (*cancellationCheck)()) {
-            unsigned long startTime = ::millis();
-            uint8_t startAngle = currentServoAngle;
-            int angleDifference = (int)targetAngle - (int)startAngle;
-
-            while (::millis() - startTime < durationMs) {
-                // Check for cancellation
-                if (cancellationCheck && !cancellationCheck()) {
-                    return; // Exit early if cancelled
-                }
-
-                unsigned long elapsedTime = ::millis() - startTime;
-                // Linear interpolation: calculate current angle based on elapsed time
-                uint8_t currentAngle = startAngle + (angleDifference * elapsedTime) / durationMs;
-                servoWrite(currentAngle);
-
-                // Small delay to prevent busy-waiting and allow servo to move
-                // ::delay(10);
+        void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, uint8_t easingType, bool (*cancellationCheck)()) {
+            // Calculate speed in degrees per second from duration
+            int angleDifference = (int)targetAngle - (int)currentServoAngle;
+            if (angleDifference == 0) {
+                return; // Already at target
             }
 
-            // Ensure we reach the exact target angle
-            servoWrite(targetAngle);
+            // Speed in degrees per second
+            uint16_t speedDegPerSec = (uint16_t)((abs(angleDifference) * 1000UL) / durationMs);
+            if (speedDegPerSec == 0) speedDegPerSec = 1; // Minimum speed
+
+            // Map easing type to ServoEasing easing function
+            uint8_t easingFunc = EASE_LINEAR; // default
+            switch (easingType) {
+                case 0: easingFunc = EASE_LINEAR; break;
+                case 1: easingFunc = EASE_QUADRATIC_IN_OUT; break;
+                case 2: easingFunc = EASE_CUBIC_IN_OUT; break;
+                case 3: easingFunc = EASE_QUARTIC_IN_OUT; break;
+                case 4: easingFunc = EASE_SINE_IN_OUT; break;
+                default: easingFunc = EASE_LINEAR; break;
+            }
+
+            // Set easing type and move to target angle with specified speed
+            servoInstance.setEasingType(easingFunc);
+            servoInstance.easeTo(targetAngle, speedDegPerSec);
+
+            // Wait for movement to complete, checking for cancellation
+            while (servoInstance.isMoving()) {
+                if (cancellationCheck && !cancellationCheck()) {
+                    servoInstance.stop();
+                    return; // Exit early if cancelled
+                }
+                delay(10);
+            }
+
+            currentServoAngle = targetAngle;
         }
     }
 #else
+    #include <cmath>
     // Mock implementations for testing
     namespace Platform {
         static uint8_t mockPinMode[14];
@@ -128,29 +145,49 @@
             mockServoAngle = angle;
         }
 
-        void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, bool (*cancellationCheck)()) {
-            unsigned long startTime = mockMillisValue;
-            uint8_t startAngle = mockServoAngle;
-            int angleDifference = (int)targetAngle - (int)startAngle;
+         void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, uint8_t easingType, bool (*cancellationCheck)()) {
+             unsigned long startTime = mockMillisValue;
+             uint8_t startAngle = mockServoAngle;
+             int angleDifference = (int)targetAngle - (int)startAngle;
 
-            while (mockMillisValue - startTime < durationMs) {
-                // Check for cancellation
-                if (cancellationCheck && !cancellationCheck()) {
-                    return; // Exit early if cancelled
-                }
+             // Simple easing function implementation for testing
+             // Maps easing type to a basic easing curve
+             auto applyEasing = [](float progress, uint8_t easingType) -> float {
+                 switch (easingType) {
+                     case 0: // EASE_LINEAR
+                         return progress;
+                     case 1: // EASE_QUADRATIC_IN_OUT
+                         return progress < 0.5f ? 2.0f * progress * progress : -1.0f + (4.0f - 2.0f * progress) * progress;
+                     case 2: // EASE_CUBIC_IN_OUT
+                         return progress < 0.5f ? 4.0f * progress * progress * progress : 1.0f + (progress - 1.0f) * (2.0f * (progress - 2.0f) * (progress - 2.0f));
+                     case 3: // EASE_QUARTIC_IN_OUT
+                         return progress < 0.5f ? 8.0f * progress * progress * progress * progress : 1.0f - 8.0f * (progress - 1.0f) * (progress - 1.0f) * (progress - 1.0f) * (progress - 1.0f);
+                     case 4: // EASE_SINE_IN_OUT
+                         return (progress < 0.5f) ? 0.5f * (1.0f - cosf(3.14159f * progress)) : 0.5f * (1.0f + cosf(3.14159f * (progress - 1.0f)));
+                     default:
+                         return progress;
+                 }
+             };
 
-                unsigned long elapsedTime = mockMillisValue - startTime;
-                // Linear interpolation: calculate current angle based on elapsed time
-                uint8_t currentAngle = startAngle + (angleDifference * elapsedTime) / durationMs;
-                servoWrite(currentAngle);
+             while (mockMillisValue - startTime < durationMs) {
+                 // Check for cancellation
+                 if (cancellationCheck && !cancellationCheck()) {
+                     return; // Exit early if cancelled
+                 }
 
-                // Small delay to advance mock time
-                delay(10);
-            }
+                 unsigned long elapsedTime = mockMillisValue - startTime;
+                 float progress = (float)elapsedTime / (float)durationMs;
+                 float easedProgress = applyEasing(progress, easingType);
+                 uint8_t currentAngle = startAngle + (uint8_t)(angleDifference * easedProgress);
+                 servoWrite(currentAngle);
 
-            // Ensure we reach the exact target angle
-            servoWrite(targetAngle);
-        }
+                 // Small delay to advance mock time
+                 delay(10);
+             }
+
+             // Ensure we reach the exact target angle
+             servoWrite(targetAngle);
+         }
     }
 
     // Test helper functions
