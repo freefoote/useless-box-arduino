@@ -3,27 +3,23 @@
 
 // Servo control helper functions
 
-// Send a single PWM pulse to the servo for a given angle
-void sendServoPulse(uint8_t pin, uint8_t angle) {
-    // Map angle (0-180) to PWM value (1000-2000 microseconds for SG90)
-    unsigned long pulseWidth = 1000 + (angle * 1000 / 180);
-    Platform::digitalWrite(pin, 1); // HIGH
-    Platform::delayMicroseconds(pulseWidth);
-    Platform::digitalWrite(pin, 0); // LOW
-    Platform::delayMicroseconds(20000 - pulseWidth);
-}
-
 // Move servo to angle over a specified duration with optional cancellation check
 static void moveServoToAngle(uint8_t pin, uint8_t angle, unsigned long duration, CancellationCheckFn cancellationCheck = nullptr) {
     unsigned long startTime = Platform::millis();
 
+    // Set the servo to the target angle immediately
+    Platform::servoWrite(angle);
+
+    // Wait for the specified duration while checking for cancellation
     while (Platform::millis() - startTime < duration) {
         // Check for cancellation
         if (cancellationCheck && !cancellationCheck()) {
             return; // Exit early if button released
         }
 
-        sendServoPulse(pin, angle);
+        // Keep servo at target angle during movement
+        Platform::servoWrite(angle);
+        Platform::delay(10); // Small delay to prevent busy-waiting
     }
 }
 

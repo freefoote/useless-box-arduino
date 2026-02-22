@@ -6,9 +6,6 @@
 #include "../lib/PersonalityManager/src/PersonalityManager.h"
 #include "../lib/ButtonInput/src/ButtonInput.h"
 
-// Forward declaration of servo pulse function from PersonalityImpl
-extern void sendServoPulse(uint8_t pin, uint8_t angle);
-
 // Create personality instances
 FastPersonality fastPersonality;
 SlowPersonality slowPersonality;
@@ -37,10 +34,10 @@ bool checkButtonStillPressed() {
 void setup() {
     Serial.begin(115200);
     button.begin();
-    pinMode(SERVO_PIN, OUTPUT);
 
-    // Initialize servo to idle position
-    sendServoPulse(SERVO_PIN, ServoConfig::START_ANGLE);
+    // Initialize servo using Platform abstraction
+    Platform::servoInit(SERVO_PIN);
+    Platform::servoWrite(ServoConfig::START_ANGLE);
     Platform::delay(100); // Brief pause to ensure servo reaches position
 
     Serial.println("Useless Box initialized!");

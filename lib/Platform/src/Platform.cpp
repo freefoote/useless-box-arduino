@@ -2,6 +2,9 @@
 
 #ifdef ARDUINO
     #include <Arduino.h>
+    #include <Servo.h>
+
+    static Servo servoInstance;
 
     namespace Platform {
         void pwmWrite(uint8_t pin, uint8_t value) {
@@ -31,6 +34,14 @@
         void delayMicroseconds(unsigned int us) {
             ::delayMicroseconds(us);
         }
+
+        void servoInit(uint8_t pin) {
+            servoInstance.attach(pin);
+        }
+
+        void servoWrite(uint8_t angle) {
+            servoInstance.write(angle);
+        }
     }
 #else
     // Mock implementations for testing
@@ -39,6 +50,7 @@
         static uint8_t mockDigitalRead[14];
         static uint8_t mockPwmWrite[14];
         static unsigned long mockMillisValue = 0;
+        static uint8_t mockServoAngle = 0;
 
         void pwmWrite(uint8_t pin, uint8_t value) {
             if (pin < 14) {
@@ -76,6 +88,17 @@
         void delayMicroseconds(unsigned int us) {
             // No-op for testing
         }
+
+        void servoInit(uint8_t pin) {
+            // Mock: just track that servo was initialized on this pin
+            if (pin < 14) {
+                mockPinMode[pin] = 0xFF; // Mark as servo pin
+            }
+        }
+
+        void servoWrite(uint8_t angle) {
+            mockServoAngle = angle;
+        }
     }
 
     // Test helper functions
@@ -112,6 +135,10 @@
                 return 0;
             }
 
+            uint8_t getServoAngle() {
+                return mockServoAngle;
+            }
+
             void reset() {
                 for (int i = 0; i < 14; i++) {
                     mockPinMode[i] = 0;
@@ -119,6 +146,7 @@
                     mockPwmWrite[i] = 0;
                 }
                 mockMillisValue = 0;
+                mockServoAngle = 0;
             }
         }
     }

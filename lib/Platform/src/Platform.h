@@ -65,6 +65,20 @@ namespace Platform {
      */
     void delayMicroseconds(unsigned int us);
 
+    /**
+     * Initialize servo on a pin
+     *
+     * @param pin The pin number to attach the servo to
+     */
+    void servoInit(uint8_t pin);
+
+    /**
+     * Write servo angle (0-180 degrees)
+     *
+     * @param angle The angle to move the servo to (0-180)
+     */
+    void servoWrite(uint8_t angle);
+
     // Test helper namespace
     namespace Test {
         void setMillis(unsigned long ms);
@@ -72,6 +86,7 @@ namespace Platform {
         uint8_t getPinMode(uint8_t pin);
         uint8_t getDigitalRead(uint8_t pin);
         uint8_t getPwmWrite(uint8_t pin);
+        uint8_t getServoAngle();
         void reset();
     }
 }
