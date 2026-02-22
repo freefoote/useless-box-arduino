@@ -16,6 +16,8 @@ A Platform.io Arduino project implementing a "useless box" with multiple persona
 
 ```bash
 pio run -e uno
+pio run -t upload -e uno
+pio device monitor -e uno
 ```
 
 ### Running Unit Tests

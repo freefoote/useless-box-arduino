@@ -35,7 +35,7 @@ bool checkButtonStillPressed() {
 }
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     button.begin();
     pinMode(SERVO_PIN, OUTPUT);
 
