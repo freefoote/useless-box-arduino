@@ -98,3 +98,22 @@ void LazyPersonality::execute(uint8_t servoPin, CancellationCheckFn cancellation
     // Slow return to start position
     moveServoToAngle(servoPin, ServoConfig::START_ANGLE, LazyPersonalityConfig::ON_DURATION, cancellationCheck);
 }
+
+// Insistent Off personality - slowly moves to off, pauses, then retracts
+void InsistentOffPersonality::execute(uint8_t servoPin, CancellationCheckFn cancellationCheck) {
+    // Slowly move to off position
+    moveServoToAngle(servoPin, InsistentOffPersonalityConfig::OFF_ANGLE, InsistentOffPersonalityConfig::OFF_DURATION, cancellationCheck);
+
+    // Check if we were cancelled mid-execution
+    if (cancellationCheck && !cancellationCheck()) {
+        // Reverse: return to start position
+        moveServoToAngle(servoPin, ServoConfig::START_ANGLE, InsistentOffPersonalityConfig::ON_DURATION, nullptr);
+        return;
+    }
+
+    // Pause at off position for 2 seconds - effectively saying "don't try this again"
+    Platform::delay(InsistentOffPersonalityConfig::PAUSE_DURATION);
+
+    // Return to start position
+    moveServoToAngle(servoPin, ServoConfig::START_ANGLE, InsistentOffPersonalityConfig::ON_DURATION, cancellationCheck);
+}

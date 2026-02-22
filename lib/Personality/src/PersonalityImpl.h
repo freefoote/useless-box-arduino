@@ -44,4 +44,15 @@ public:
     unsigned long getDuration() const override { return 3000; }
 };
 
+/**
+ * Insistent Off personality - slowly moves to turn off, pauses, then retracts
+ * Effectively says "don't try this again" to the user
+ */
+class InsistentOffPersonality : public Personality {
+public:
+    void execute(uint8_t servoPin, CancellationCheckFn cancellationCheck = nullptr) override;
+    const char* getName() const override { return "InsistentOff"; }
+    unsigned long getDuration() const override { return 4000; }
+};
+
 #endif // PERSONALITY_IMPL_H

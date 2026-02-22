@@ -59,4 +59,12 @@ namespace LazyPersonalityConfig {
     const unsigned long ON_DURATION = 500;   // Time to return on (ms)
 }
 
+// Insistent Off Personality - slowly moves to off, pauses, then retracts
+namespace InsistentOffPersonalityConfig {
+    const uint8_t OFF_ANGLE = SWITCH_OFF_ANGLE;            // Angle to move to (off position)
+    const unsigned long OFF_DURATION = 1500; // Time to move off slowly (ms)
+    const unsigned long PAUSE_DURATION = 2000; // Pause at off position (ms) - "don't try this again"
+    const unsigned long ON_DURATION = 500;   // Time to return on (ms)
+}
+
 #endif // CONFIG_H

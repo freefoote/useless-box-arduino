@@ -11,17 +11,19 @@ FastPersonality fastPersonality;
 SlowPersonality slowPersonality;
 JitteryPersonality jitteryPersonality;
 LazyPersonality lazyPersonality;
+InsistentOffPersonality insistentOffPersonality;
 
 // Create personality array
 Personality* personalities[] = {
     &fastPersonality,
     &slowPersonality,
     &jitteryPersonality,
-    &lazyPersonality
+    &lazyPersonality,
+    &insistentOffPersonality
 };
 
 // Create manager
-PersonalityManager personalityManager(personalities, 4);
+PersonalityManager personalityManager(personalities, 5);
 
 // Create button input
 ButtonInput button(BUTTON_PIN);
