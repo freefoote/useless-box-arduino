@@ -1,13 +1,13 @@
 #include <Arduino.h>
+#include "../include/config.h"
 #include "../lib/Platform/src/Platform.h"
 #include "../lib/Personality/src/Personality.h"
 #include "../lib/Personality/src/PersonalityImpl.h"
 #include "../lib/PersonalityManager/src/PersonalityManager.h"
 #include "../lib/ButtonInput/src/ButtonInput.h"
 
-// Pin definitions
-const uint8_t BUTTON_PIN = 2;
-const uint8_t SERVO_PIN = 9;
+// Forward declaration of servo pulse function from PersonalityImpl
+extern void sendServoPulse(uint8_t pin, uint8_t angle);
 
 // Create personality instances
 FastPersonality fastPersonality;
@@ -38,6 +38,10 @@ void setup() {
     Serial.begin(9600);
     button.begin();
     pinMode(SERVO_PIN, OUTPUT);
+
+    // Initialize servo to idle position
+    sendServoPulse(SERVO_PIN, ServoConfig::START_ANGLE);
+    Platform::delay(100); // Brief pause to ensure servo reaches position
 
     Serial.println("Useless Box initialized!");
     Serial.print("Starting personality: ");
