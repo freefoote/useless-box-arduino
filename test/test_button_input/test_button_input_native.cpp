@@ -77,11 +77,84 @@ void test_button_input_get_state(void) {
     TEST_ASSERT_TRUE(button.getState());
 }
 
+void test_button_input_reset_press_flag(void) {
+    ButtonInput button(2);
+    button.begin();
+
+    // Simulate button press
+    Platform::Test::setDigitalRead(2, 0);
+    Platform::Test::setMillis(0);
+
+    // First read detects change but doesn't trigger press yet
+    bool pressed = button.isPressed();
+    TEST_ASSERT_FALSE(pressed);
+
+    // After debounce, should detect press
+    Platform::Test::setMillis(60);
+    pressed = button.isPressed();
+    TEST_ASSERT_TRUE(pressed);
+
+    // Second call while still pressed should return false (already reported)
+    pressed = button.isPressed();
+    TEST_ASSERT_FALSE(pressed);
+
+    // Reset the press flag
+    button.resetPressFlag();
+
+    // Now even though button is still physically pressed, the flag is cleared
+    // so the next isPressed() call should detect it as a new press
+    pressed = button.isPressed();
+    TEST_ASSERT_TRUE(pressed);
+
+    // Second call after reset should return false again
+    pressed = button.isPressed();
+    TEST_ASSERT_FALSE(pressed);
+}
+
+void test_button_input_race_condition_scenario(void) {
+    // This test simulates the race condition fix:
+    // 1. Button is pressed and detected
+    // 2. Action completes with a delay
+    // 3. During the delay, user presses button again
+    // 4. After delay, flag is reset
+    // 5. Next loop iteration should detect the new press
+
+    ButtonInput button(2);
+    button.begin();
+
+    // Initial press
+    Platform::Test::setDigitalRead(2, 0);
+    Platform::Test::setMillis(0);
+    bool pressed = button.isPressed();
+    TEST_ASSERT_FALSE(pressed);
+
+    Platform::Test::setMillis(60);
+    pressed = button.isPressed();
+    TEST_ASSERT_TRUE(pressed);
+
+    // Simulate action execution and delay
+    Platform::Test::setMillis(160); // 100ms delay
+
+    // User presses button during the delay (button still LOW)
+    // isPressed() returns false because flag is already set
+    pressed = button.isPressed();
+    TEST_ASSERT_FALSE(pressed);
+
+    // After delay, reset the flag (as done in main.cpp)
+    button.resetPressFlag();
+
+    // Now the next isPressed() call should detect the press that occurred during delay
+    pressed = button.isPressed();
+    TEST_ASSERT_TRUE(pressed);
+}
+
 int main(int argc, char **argv) {
     UNITY_BEGIN();
     RUN_TEST(test_button_input_initialization);
     RUN_TEST(test_button_input_press_detection);
     RUN_TEST(test_button_input_debounce);
     RUN_TEST(test_button_input_get_state);
+    RUN_TEST(test_button_input_reset_press_flag);
+    RUN_TEST(test_button_input_race_condition_scenario);
     return UNITY_END();
 }

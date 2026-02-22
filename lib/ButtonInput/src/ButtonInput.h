@@ -46,6 +46,12 @@ public:
      * @return true if button is currently pressed, false otherwise
      */
     bool getState() const;
+
+    /**
+     * Reset the button press flag to clear the "pressed" state
+     * Useful for clearing the flag after a known action completes
+     */
+    void resetPressFlag();
 };
 
 #endif // BUTTON_INPUT_H

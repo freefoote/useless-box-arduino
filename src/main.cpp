@@ -67,6 +67,11 @@ void loop() {
          Platform::servoDetach();
          Serial.println("Servo detached - power saving mode");
 
+         // Reset button press flag to clear the "pressed" state
+         // This prevents the race condition where a button press during the delay
+         // would be missed because the flag was already set
+         button.resetPressFlag();
+
          // Move to next personality for next activation
          personalityManager.nextPersonality();
          Serial.print("Next personality will be: ");

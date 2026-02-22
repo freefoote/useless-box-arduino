@@ -40,3 +40,7 @@ bool ButtonInput::isPressed() {
 bool ButtonInput::getState() const {
     return Platform::digitalRead(pin) == 0; // LOW = 0
 }
+
+void ButtonInput::resetPressFlag() {
+    lastReportedPin = 255; // Reset the flag to allow next press to be detected
+}
