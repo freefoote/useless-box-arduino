@@ -48,20 +48,30 @@ void setup() {
 }
 
 void loop() {
-    // Check if button was pressed
-    if (button.isPressed()) {
-        Serial.print("Button pressed! Executing personality: ");
-        Serial.println(personalityManager.getCurrent()->getName());
+     // Check if button was pressed
+     if (button.isPressed()) {
+         // Re-attach servo before execution (in case it was detached from previous cycle)
+         Platform::servoInit(SERVO_PIN);
+         Platform::servoWrite(ServoConfig::START_ANGLE);
+         Platform::delay(100); // Brief pause to ensure servo reaches position
 
-        // Execute current personality with cancellation check
-        // If button is released during execution, the personality will reverse
-        personalityManager.executeCurrent(SERVO_PIN, checkButtonStillPressed);
+         Serial.print("Button pressed! Executing personality: ");
+         Serial.println(personalityManager.getCurrent()->getName());
 
-        // Move to next personality for next activation
-        personalityManager.nextPersonality();
-        Serial.print("Next personality will be: ");
-        Serial.println(personalityManager.getCurrent()->getName());
-    }
+         // Execute current personality with cancellation check
+         // If button is released during execution, the personality will reverse
+         personalityManager.executeCurrent(SERVO_PIN, checkButtonStillPressed);
 
-    delay(10); // Small delay to prevent overwhelming the loop
-}
+         // Detach servo to save battery power
+         delay(100);
+         Platform::servoDetach();
+         Serial.println("Servo detached - power saving mode");
+
+         // Move to next personality for next activation
+         personalityManager.nextPersonality();
+         Serial.print("Next personality will be: ");
+         Serial.println(personalityManager.getCurrent()->getName());
+     }
+
+     delay(10); // Small delay to prevent overwhelming the loop
+ }

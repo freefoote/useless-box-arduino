@@ -6,7 +6,7 @@
 // Move servo to angle over a specified duration with optional cancellation check
 static void moveServoToAngle(uint8_t pin, uint8_t angle, unsigned long duration, CancellationCheckFn cancellationCheck = nullptr) {
     // Use smooth movement with the specified duration (easing type 0 = linear)
-    Platform::servoSmoothMove(angle, duration, 0, cancellationCheck);
+    Platform::servoSmoothMove(angle, duration, 2, cancellationCheck);
 }
 
 // Fast personality - quick flick

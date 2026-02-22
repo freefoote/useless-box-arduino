@@ -48,6 +48,10 @@
             currentServoAngle = angle;
         }
 
+        void servoDetach() {
+            servoInstance.detach();
+        }
+
         void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, uint8_t easingType, bool (*cancellationCheck)()) {
             // Calculate speed in degrees per second from duration
             int angleDifference = (int)targetAngle - (int)currentServoAngle;
@@ -143,6 +147,11 @@
 
         void servoWrite(uint8_t angle) {
             mockServoAngle = angle;
+        }
+
+        void servoDetach() {
+            // Mock: just clear the servo angle
+            mockServoAngle = 0;
         }
 
          void servoSmoothMove(uint8_t targetAngle, unsigned long durationMs, uint8_t easingType, bool (*cancellationCheck)()) {

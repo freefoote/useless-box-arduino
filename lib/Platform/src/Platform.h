@@ -79,6 +79,12 @@ namespace Platform {
      */
     void servoWrite(uint8_t angle);
 
+    /**
+     * Detach servo to stop power consumption
+     * This disables PWM on the servo pin, allowing the servo to be powered down
+     */
+    void servoDetach();
+
      /**
       * Move servo smoothly to a target angle over a specified duration with easing
       *
