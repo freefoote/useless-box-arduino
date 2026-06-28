@@ -62,8 +62,9 @@ void loop() {
          // If button is released during execution, the personality will reverse
          personalityManager.executeCurrent(SERVO_PIN, checkButtonStillPressed);
 
-         // Detach servo to save battery power
-         delay(100);
+         // Ensure servo has reached its final position before detaching
+         // Wait a bit more to ensure smooth movement is complete
+         Platform::delay(200); // Longer delay to ensure final positioning
          Platform::servoDetach();
          Serial.println("Servo detached - power saving mode");
 
@@ -79,4 +80,4 @@ void loop() {
      }
 
      delay(10); // Small delay to prevent overwhelming the loop
- }
+}
