@@ -13,7 +13,7 @@ const uint8_t BUTTON_PIN = 2;
 // Servo control pin
 const uint8_t SERVO_PIN = 8;
 
-#define IDLE_ANGLE 180
+#define IDLE_ANGLE 190
 #define SWITCH_OFF_ANGLE 30
 
 // ============================================================================
