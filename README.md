@@ -52,7 +52,7 @@ Because I'm a masochist apparently.
 ## Pin Configuration
 
 - **Button**: GPIO 2 (with internal pull-up)
-- **Servo**: GPIO 9 (PWM)
+- **Servo**: GPIO 8 (PWM)
 
 ## Project Structure
 
