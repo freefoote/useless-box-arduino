@@ -10,7 +10,19 @@ A Platform.io Arduino project implementing a "useless box" with multiple persona
 - **Modular Architecture**: Clean separation of concerns with reusable libraries
 - **Arduino UNO Compatible**: Runs on Arduino UNO with SG90 servo
 
+## Building the actual box
+
+The production "useless box" that this matches was actually made by someone other than me; so I don't have design files for an actual box. Their box was a handmade wooden box which fits the theme of the other items they made. I then contributed the hardware and software for the device.
+
+However, a quick search for "3d print useless box with sg90 servo" should find you plenty of starting points for a useless box. This code should adapt easily to an ESP32 or Arduino Nano if needed.
+
+## AI Disclaimer
+
+Yes, this whole project was largely coded by an LLM based on my instructions. It's got tests at least, and I did have to fiddle with the code a little bit to get it to actually work properly and smoothly. Your mileage may vary, as the saying goes.
+
 ## Quick Start
+
+As noted, this uses Platform.io; you can either use `uv` and then `uv tool install platformio`; or use the VS Code extension; or any other method of running Platform.io as you normally would. For work reasons, I was on Windows and thus used Windows, but this should work much more smoothly on a unix like operating system - especially the unit tests.
 
 ### Building for Arduino UNO
 
@@ -124,11 +136,3 @@ See [TESTING_GUIDE.md](TESTING_GUIDE.md#adding-new-personalities) for instructio
 ## Troubleshooting
 
 See [TESTING_GUIDE.md](TESTING_GUIDE.md#troubleshooting) for common issues and solutions.
-
-## License
-
-[Add your license here]
-
-## Author
-
-[Add your name here]
